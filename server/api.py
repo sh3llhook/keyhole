@@ -9,7 +9,7 @@ from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
 
 # initialization
-parser = SafeConfigParser
+parser = SafeConfigParser()
 parser.read('config.ini')
 app = Flask(__name__)
 app.config['SECRET_KEY'] = parser.get('server_config', 'SECRET_KEY')
@@ -57,7 +57,8 @@ class Data(db.Model):
     key = db.Column(db.String(4096))
     passw = db.Column(db.String(128))
     comments = db.Column(db.String(500))
-    uid = db.Column(Integer, ForeignKey('user.id'))
+    uid = db.Column(db.String(32), db.ForeignKey('users.username'))
+
 
 @auth.verify_password
 def verify_password(username_or_token, password):
@@ -87,6 +88,17 @@ def new_user():
     return (jsonify({'username': user.username}), 201,
             {'Location': url_for('get_user', id=user.id, _external=True)})
 
+@app.route('/api/records/new', methods=['POST'])
+@auth.login_required
+def new_record():
+    ip = request.json.get('ip')
+    uname = request.json.get('uname')
+    key = request.json.get('key')
+    passw = request.json.get('passw')
+    comments = request.json.get('comments')
+    if ip is None or uname is None or key is None or passw is None:
+        abort(400)
+    return jsonify({'ip':ip,'uname':uname,'key':key,'passw':passw})
 
 @app.route('/api/users/<int:id>')
 def get_user(id):
