@@ -8,6 +8,10 @@ record_id, ip, uname, key, password, notes, uid <- uid is foreign key to user_lo
 
 Since the uid in user_data is a foreign key to user_login(username), the database will search for all records with the foreign key matching the authenticated username, and send them to the client.
 
+
+search_records:
+The server will have everything encrypted, so it can't actually search. We need to get all records for the users uid, and send them to the client. The client will then decrypt it and then search for the thing the user wanted...
+
 --- client ---
 The client takes username/password for a user, sends it to the server. If the server auths, it prompts user for encryption key. Client sends request to the server asking for all records for that user. Attempts to decrypt them and then user can search through the client. 
 
