@@ -16,10 +16,11 @@ while True:
     connection, client_address = sock.accept()
     try:
         print >>sys.stderr, 'connection from', client_address
-
-        # Receive the data in small chunks and retransmit it:
-        data = connection.recv(256)
-        print >>sys.stderr, 'received "%s"' % data
+        while True:
+			# Receive the data in small chunks and retransmit it:
+			data = connection.recv(256)
+			if data == "read database":
+				print "they want da data mon"
 
     finally:
         # Clean up the connection

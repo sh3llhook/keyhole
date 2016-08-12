@@ -1,0 +1,10 @@
+functions:
+
+==add_user==
+-creates a new uid record in the table for a new user of the app
+
+==add_host==
+-adds a new host to our database for a particular uid
+
+==add_ip/uname/key/passw/comment==
+-add a value to an exisiting record

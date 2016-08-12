@@ -11,11 +11,12 @@ server_address = ('localhost', 10000)
 print >>sys.stderr, 'connecting to %s port %s' % server_address
 sock.connect(server_address)
 try:
-    
-    # Send data
-    message = 'This is the message.  It will be repeated.'
-    print >>sys.stderr, 'sending "%s"' % message
-    sock.sendall(message)
+    while True: 
+        # Send data
+        #message = 'This is the message.  It will be repeated.'
+        message = raw_input(">>> ")
+        print >>sys.stderr, 'sending "%s"' % message
+        sock.sendall(message)
 
 finally:
     print >>sys.stderr, 'closing socket'

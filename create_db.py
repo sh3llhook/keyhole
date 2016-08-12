@@ -8,6 +8,8 @@
 # Each user has their own table in the database.
 # id, IP, username, SSH key, password, comments
 
+# id, uid, ip, uname, key, passw, comment
+
 import sqlite3
 import sys
 import os
@@ -21,6 +23,7 @@ Base = declarative_base()
 class sean(Base):
     __tablename__ = 'sean'
     id = Column(Integer, primary_key=True)
+    uid = Column(String(250), nullable=False)
     ip = Column(String(250), nullable=False)
     uname = Column(String(250), nullable=False)
     key = Column(String(250), nullable=False)
