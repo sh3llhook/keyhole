@@ -98,7 +98,7 @@ def new_record():
     comments = request.json.get('comments')
     if ip is None or uname is None or key is None or passw is None:
         abort(400)
-    return jsonify({'ip':ip,'uname':uname,'key':key,'passw':passw})
+    return jsonify({'ip':ip,'uname':uname,'key':key,'passw':passw,"uid":g.user.id})
 
 @app.route('/api/users/<int:id>')
 def get_user(id):
