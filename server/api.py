@@ -91,13 +91,19 @@ def new_user():
 @app.route('/api/records/new', methods=['POST'])
 @auth.login_required
 def new_record():
+    # gets the values the user sends over in their request
     ip = request.json.get('ip')
     uname = request.json.get('uname')
     key = request.json.get('key')
     passw = request.json.get('passw')
     comments = request.json.get('comments')
+    uid = g.user.id # gets the users id for the foreign key value in db
     if ip is None or uname is None or key is None or passw is None:
         abort(400)
+    else:
+        data = Data(ip=ip, uname=uname, key=key, passw=passw, comments=comments, uid=uid)
+        db.session.add(data)
+        db.session.commit()
     return jsonify({'ip':ip,'uname':uname,'key':key,'passw':passw,"uid":g.user.id})
 
 @app.route('/api/users/<int:id>')
