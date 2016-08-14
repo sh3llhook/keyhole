@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 import os
+import json
+from sqlalchemy import *
 from ConfigParser import SafeConfigParser
 from flask import Flask, abort, request, jsonify, g, url_for
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import literal
 from flask.ext.httpauth import HTTPBasicAuth
 from passlib.apps import custom_app_context as pwd_context
 from itsdangerous import (TimedJSONWebSignatureSerializer
@@ -59,6 +62,10 @@ class Data(db.Model):
     comments = db.Column(db.String(500))
     uid = db.Column(db.String(32), db.ForeignKey('users.username'))
 
+    @staticmethod
+    def search_user_record(uid): 
+        rows = Data.query.filter_by(record_id==uid)
+        return rows
 
 @auth.verify_password
 def verify_password(username_or_token, password):
@@ -105,6 +112,33 @@ def new_record():
         db.session.add(data)
         db.session.commit()
     return jsonify({'ip':ip,'uname':uname,'key':key,'passw':passw,"uid":g.user.id})
+
+@app.route('/api/records/get')
+@auth.login_required
+def get_records():
+    #Data = Table('data', db, autoload=True)
+    uuid = g.user.id #gets users ID so we can find all records for our user and return them.
+    print "------", uuid
+    #rows = Data.select(uid==uuid)
+    #rows = db.session.query(Data.uid == uuid)
+    #rows = db.session.query(Data).filter(Data.uid=uuid)
+    #rs = rows.execute()
+    #for r in rs:
+    #    print r
+    #for u in rows:
+    #    print u.__dict__
+    rows = Data.query.filter_by(uid=uuid).all()
+    print "------ got rows ------"
+    for r in rows:
+        print "++++++++++++++++++++"
+        print "____",r.record_id,"____"
+        print "____",r.ip,"____"
+        print "____",r.key,"____"
+        print "____",r.uname,"____"
+        print "____",r.passw,"____"
+        print "____",r.comments,"____"
+    #d = search_user_record(uuid)
+    return 'i'
 
 @app.route('/api/users/<int:id>')
 def get_user(id):

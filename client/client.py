@@ -47,6 +47,10 @@ def create_record(user_token):
 
     print response.status_code
 
+def search_record(user_token):
+    url = 'http://127.0.0.1:5000/api/records/get'
+    response = requests.get(url, auth=HTTPBasicAuth(user_token, 'x'))
+    print response.status_code
 
 
 if __name__ == '__main__':
@@ -59,5 +63,7 @@ if __name__ == '__main__':
         elif uinput == "create record":
             print token
             create_record(token)
+        elif uinput == "search record":
+            search_record(token)
         else:
             print "blah you're wrong"
