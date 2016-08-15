@@ -1,10 +1,18 @@
-functions:
+server just acts as a way to interact with the database. It does not have any keys to decrypt data, and cannot process it in any way. Two tables:
 
-==add_user==
--creates a new uid record in the table for a new user of the app
+user_login:
+uid, username, password
 
-==add_host==
--adds a new host to our database for a particular uid
+user_data:
+record_id, ip, uname, key, password, notes, uid <- uid is foreign key to user_login(username)
 
-==add_ip/uname/key/passw/comment==
--add a value to an exisiting record
+Since the uid in user_data is a foreign key to user_login(username), the database will search for all records with the foreign key matching the authenticated username, and send them to the client.
+
+
+search_records:
+The server will have everything encrypted, so it can't actually search. We need to get all records for the users uid, and send them to the client. The client will then decrypt it and then search for the thing the user wanted...
+
+--- client ---
+The client takes username/password for a user, sends it to the server. If the server auths, it prompts user for encryption key. Client sends request to the server asking for all records for that user. Attempts to decrypt them and then user can search through the client. 
+
+Any updates to records are sent to the server, just replace the whole line matching by uid and record id.
