@@ -116,18 +116,25 @@ def new_record():
 @auth.login_required
 def get_records():
     uuid = g.user.id #gets users ID so we can find all records for our user and return them.
-    print "------", uuid
     rows = Data.query.filter_by(uid=uuid).all()
-    print "------ got rows ------"
+    rtrn_row = {}
+    i = 0
     for r in rows:
         print "++++++++++++++++++++"
+        rtrn_row[i] = {"id":r.record_id}
         print "____",r.record_id,"____"
         print "____",r.ip,"____"
+        rtrn_row[i] = {"ip":r.ip}
         print "____",r.key,"____"
+        rtrn_row[i] = {"key":r.key}
         print "____",r.uname,"____"
+        rtrn_row[i] = {"uname":r.uname}
         print "____",r.passw,"____"
+        rtrn_row[i] = {"passw":r.passw}
         print "____",r.comments,"____"
-    return 'i'
+        rtrn_row[i] = {"comments":r.comments}
+        i = i + 1
+    return jsonify(rtrn_row)
 
 @app.route('/api/users/<int:id>')
 def get_user(id):
