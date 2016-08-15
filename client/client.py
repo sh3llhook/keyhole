@@ -13,7 +13,9 @@ from Crypto import Random
 def encrypt(key, string, iv):
     rtrn_val = []
     BS = 16
-    pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
+    #pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
+    PADDING = '{'
+    pad = lambda s: s + (BS - len(s) % BS) * PADDING
 
     crypto_suite = AES.new(pad(key), AES.MODE_CBC, iv)
     cipher_text = crypto_suite.encrypt(pad(string))
@@ -21,12 +23,14 @@ def encrypt(key, string, iv):
 
 def decrypt(key, string, iv):
     BS = 16
-    unpad = lambda s : s[0:-ord(s[-1])]
-    pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
+    #unpad = lambda s : s[0:-ord(s[-1])]
+    PADDING = '{'
+    pad = lambda s: s + (BS - len(s) % BS) * PADDING
+   # pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
 
     decrypt_suite = AES.new(pad(key), AES.MODE_CBC, iv)
     string_de = string.decode('hex')
-    plain_text = decrypt_suite.decrypt(unpad(string_de))
+    plain_text = decrypt_suite.decrypt(string_de).rstrip('{')
     print plain_text
 
 
