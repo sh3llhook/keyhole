@@ -51,6 +51,8 @@ def search_record(user_token):
     url = 'http://127.0.0.1:5000/api/records/get'
     response = requests.get(url, auth=HTTPBasicAuth(user_token, 'x'))
     print response.status_code
+    for i in response:
+        print i
 
 
 if __name__ == '__main__':

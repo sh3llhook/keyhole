@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from collections import defaultdict
 import os
 import json
 from ConfigParser import SafeConfigParser
@@ -117,22 +118,23 @@ def new_record():
 def get_records():
     uuid = g.user.id #gets users ID so we can find all records for our user and return them.
     rows = Data.query.filter_by(uid=uuid).all()
-    rtrn_row = {}
+    rtrn_row = defaultdict(dict)
+    l_one = {}
     i = 0
     for r in rows:
         print "++++++++++++++++++++"
-        rtrn_row[i] = {"id":r.record_id}
+        rtrn_row[i][0] = r.record_id
         print "____",r.record_id,"____"
+        rtrn_row[i][1] = r.ip
         print "____",r.ip,"____"
-        rtrn_row[i] = {"ip":r.ip}
+        rtrn_row[i][2] = r.key
         print "____",r.key,"____"
-        rtrn_row[i] = {"key":r.key}
+        rtrn_row[i][3] = r.uname
         print "____",r.uname,"____"
-        rtrn_row[i] = {"uname":r.uname}
+        rtrn_row[i][4] = r.passw
         print "____",r.passw,"____"
-        rtrn_row[i] = {"passw":r.passw}
+        rtrn_row[i][5] = r.comments
         print "____",r.comments,"____"
-        rtrn_row[i] = {"comments":r.comments}
         i = i + 1
     return jsonify(rtrn_row)
 
