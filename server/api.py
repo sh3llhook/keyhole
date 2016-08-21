@@ -60,12 +60,19 @@ class Data(db.Model):
     key = db.Column(db.String(4096))
     passw = db.Column(db.String(128))
     comments = db.Column(db.String(500))
+    iv = db.Column(db.String(16))
     uid = db.Column(db.String(32), db.ForeignKey('users.username'))
 
     @staticmethod
     def search_user_record(uid): 
         rows = Data.query.filter_by(record_id==uid)
         return rows
+
+class IV(db.Model):
+    __tablename__ = 'iv'
+    id = db.Column(db.Integer, primary_key=True)
+    iv_map = db.Column(db.Integer, db.ForeignKey('data.record_id'))
+    iv = db.Column(db.String(16))
 
 @auth.verify_password
 def verify_password(username_or_token, password):
@@ -104,14 +111,15 @@ def new_record():
     key = request.json.get('key')
     passw = request.json.get('passw')
     comments = request.json.get('comments')
+    iv = request.json.get('iv')
     uid = g.user.id # gets the users id for the foreign key value in db
     if ip is None or uname is None or key is None or passw is None:
         abort(400)
     else:
-        data = Data(ip=ip, uname=uname, key=key, passw=passw, comments=comments, uid=uid)
+        data = Data(ip=ip, uname=uname, key=key, passw=passw, comments=comments, uid=uid, iv=iv)
         db.session.add(data)
         db.session.commit()
-    return jsonify({'ip':ip,'uname':uname,'key':key,'passw':passw,"uid":g.user.id})
+    return jsonify({'ip':ip,'uname':uname,'key':key,'passw':passw,"uid":g.user.id, "iv":iv})
 
 @app.route('/api/records/get')
 @auth.login_required

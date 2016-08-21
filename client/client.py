@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import requests
+import binascii
+import base64
 import json
 import hashlib, binascii
 import os
@@ -13,13 +15,15 @@ from Crypto import Random
 def encrypt(key, string, iv):
     rtrn_val = []
     BS = 16
-    #pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
+
     PADDING = '{'
     pad = lambda s: s + (BS - len(s) % BS) * PADDING
 
     crypto_suite = AES.new(pad(key), AES.MODE_CBC, iv)
     cipher_text = crypto_suite.encrypt(pad(string))
-    return cipher_text.encode('hex')
+    rtrn_val.append(cipher_text.encode('hex'))
+    rtrn_val.append(iv)
+    return cipher_text.encode('hex') #rtrn_val
 
 def decrypt(key, string, iv):
     BS = 16
@@ -65,6 +69,8 @@ def get_token():
 
 # create new record
 def create_record(user_token):
+    # generating IV here so each row is the same. Makes DB work easier
+    iv = os.urandom(16)
     url = 'http://127.0.0.1:5000/api/records/new'
     print '[+] Enter the values below to add a new record to the database...'
     ip = raw_input('[+] IP Address: ')
@@ -73,10 +79,24 @@ def create_record(user_token):
     passw = raw_input('[+] Password: ')
     comments = raw_input('[+] Comments: ')
     password = raw_input("[+] Enter password for crypto: ")
-    crypt_ip = encrypt(password, ip)
-    print crypt_ip
+    crypt_ip = encrypt(password, ip, iv)
+    crypt_uname = encrypt(password, uname, iv)
+    crypt_key = encrypt(password, key, iv)
+    crypt_passw = encrypt(password, passw, iv)
+    crypt_comments = encrypt(password, comments, iv)
+    iv = unicode(iv, errors='ignore')
 
-    response = requests.post(url, auth=HTTPBasicAuth(user_token, 'x'), json={'ip':ip, 'uname':uname, 'key':key, 'passw':passw, 'comments':comments})
+    #decrypt(password, crypt_ip[0], crypt_ip[1])
+
+    response = requests.post(url, auth=HTTPBasicAuth(user_token, 'x'), json={\
+                'ip':crypt_ip, \
+                'uname':crypt_uname, \
+                'key':crypt_key, \
+                'passw':crypt_passw, \
+                'comments':crypt_comments, \
+                'iv':iv\
+                }
+                )
 
     print response.status_code
 
@@ -84,7 +104,9 @@ def search_record(user_token):
     url = 'http://127.0.0.1:5000/api/records/get'
     response = requests.get(url, auth=HTTPBasicAuth(user_token, 'x'))
     print response.status_code
+    key = raw_input("[+] Enter your decryption password: ")
     for i in response:
+    #key, stirng, iv
         print i
 
 
@@ -105,8 +127,8 @@ if __name__ == '__main__':
             decrypt(raw_input('passworrrd: '), raw_input('cipher: ').strip(), raw_input('iv: ').strip())
         elif uinput == "test":
             #key, string-to-crypt, iv
-            cipher_text = encrypt('bbbb', 'ccc', 'a'*16)
-            decrypt('bbbb', cipher_text, 'a'*16)
+            cipher_text = encrypt('bbbb', 'ccc')
+            decrypt('bbbb', cipher_text[0], cipher_text[1])
         else:
             print "blah you're wrong"
 
