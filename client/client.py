@@ -31,7 +31,7 @@ def decrypt(key, string, iv):
     pad = lambda s: s + (BS - len(s) % BS) * PADDING
    # pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
 
-    decrypt_suite = AES.new(pad(key), AES.MODE_CBC, iv)
+    decrypt_suite = AES.new(pad(key), AES.MODE_CBC, iv.decode('hex'))
     string_de = string.decode('hex')
     plain_text = decrypt_suite.decrypt(string_de).rstrip('{')
     print plain_text
@@ -83,7 +83,7 @@ def create_record(user_token):
     crypt_key = encrypt(password, key, iv)
     crypt_passw = encrypt(password, passw, iv)
     crypt_comments = encrypt(password, comments, iv)
-    iv = unicode(iv, errors='ignore')
+    #iv = unicode(iv, errors='ignore')
 
     #decrypt(password, crypt_ip[0], crypt_ip[1])
 
@@ -93,7 +93,7 @@ def create_record(user_token):
                 'key':crypt_key, \
                 'passw':crypt_passw, \
                 'comments':crypt_comments, \
-                'iv':iv\
+                'iv':iv.encode('hex')\
                 }
                 )
 
@@ -106,11 +106,11 @@ def search_record(user_token):
     key = raw_input("[+] Enter your decryption password: ")
 
     data = json.loads(response.text)
-    print data
-    for k,v in data.iteritems():
-        for k_i, v_i in v.iteritems():
-            print v_i
 
+    print "-" * 25
+    print 'ip_addr ', data['1']['1']
+    print 'iv ', data['1']['6']
+    decrypt(key, data['1']['2'], data['1']['6'])
 
 if __name__ == '__main__':
     while True:

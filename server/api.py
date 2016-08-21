@@ -143,6 +143,8 @@ def get_records():
         print "____",r.passw,"____"
         rtrn_row[i][5] = r.comments
         print "____",r.comments,"____"
+        rtrn_row[i][6] = r.iv
+        print "____",r.iv,"____"
         i = i + 1
     return jsonify(rtrn_row)
 
