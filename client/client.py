@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
 import requests
-import binascii
-import base64
+import json
 import json
 import hashlib, binascii
 import os
@@ -105,9 +104,12 @@ def search_record(user_token):
     response = requests.get(url, auth=HTTPBasicAuth(user_token, 'x'))
     print response.status_code
     key = raw_input("[+] Enter your decryption password: ")
-    for i in response:
-    #key, stirng, iv
-        print i
+
+    data = json.loads(response.text)
+    print data
+    for k,v in data.iteritems():
+        for k_i, v_i in v.iteritems():
+            print v_i
 
 
 if __name__ == '__main__':
