@@ -31,6 +31,7 @@ def decrypt(key, string, iv):
     pad = lambda s: s + (BS - len(s) % BS) * PADDING
    # pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
 
+    # iv is coming in as hex b/c DB storage
     decrypt_suite = AES.new(pad(key), AES.MODE_CBC, iv.decode('hex'))
     string_de = string.decode('hex')
     plain_text = decrypt_suite.decrypt(string_de).rstrip('{')
@@ -107,10 +108,15 @@ def search_record(user_token):
 
     data = json.loads(response.text)
 
-    print "-" * 25
-    print 'ip_addr ', data['1']['1']
-    print 'iv ', data['1']['6']
-    decrypt(key, data['1']['2'], data['1']['6'])
+    # attempts to decrypt all records. decrypt() prints the record.
+    for k, v in data.iteritems():
+        for k_i, v_i in v.iteritems():
+            if not isinstance(v_i, int):
+                 # key, string, iv
+                decrypt(key, v_i, data[k]['6'])
+            else:
+                continue
+
 
 if __name__ == '__main__':
     while True:
